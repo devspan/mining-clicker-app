@@ -5,7 +5,7 @@ const { transfer } = require('./cryptoOperations-bsc');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://sendchain-ee5ed-default-rtdb.firebaseio.com/"
+  databaseURL: "https://panda-kombat-default-rtdb.firebaseio.com/"
 });
 
 const express = require('express');

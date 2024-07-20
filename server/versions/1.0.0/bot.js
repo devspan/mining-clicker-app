@@ -13,7 +13,7 @@ bot.start((ctx) => {
         inline_keyboard: [
           [{
             text: 'Play Now! 🎡',
-            web_app: { url: 'https://justinstar-py.github.io/mining-mini-app/' }
+            web_app: { url: 'https://mining-clicker-app-wheat.vercel.app/' }
           }],
           [{ text: 'Show Profile 🌀', callback_data: 'show_profile' }]
         ]
