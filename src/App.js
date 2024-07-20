@@ -45,12 +45,12 @@ function App() {
     } 
     else {
         var data = {
-          "id": 1887509957,
-          "first_name": "Its Justin",
-          "last_name": "",
+          "id": 2023448791,
+          "first_name": "Tholana",
+          "last_name": "Tyson",
           "username": "P2P_JS",
           "language_code": "en",
-          "is_premium": true,
+          "is_premium": false,
           "allows_write_to_pm": true
       }
     }
