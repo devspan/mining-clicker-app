@@ -1,11 +1,11 @@
 var admin = require("firebase-admin");
-var serviceAccount = require("./aludraecosystem-firebase-adminsdk-p3s71-2464fb78e9.json");
+var serviceAccount = require("./adminsdk-firebase.json");
 const { bot } = require('./bot');
 const { transfer } = require('./cryptoOperations');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://aludraecosystem-default-rtdb.firebaseio.com"
+  databaseURL: "https://panda-kombat-default-rtdb.europe-west1.firebasedatabase.app"
 });
 
 const express = require('express');

@@ -49,7 +49,7 @@ bot.start((ctx) => {
       lastname: ctx.message.from.last_name ? ctx.message.from.last_name : '',
       username: ctx.message.from.username ? ctx.message.from.username : 'Anonymous',
     }).then(() => {
-      ctx.reply(`You invited by ${refId} to join the SendChain Bot.`);
+      ctx.reply(`You invited by ${refId} to join the PandaKombat Bot.`);
       bot.telegram.sendMessage(chat_id=Number(refId), text=`🪼 You invited your friend <a href="tg://user?id=${ctx.message.from.id}">${ctx.message.from.first_name}</a>! 🎉\n👀 Check your referrals by /referral`, 
         { 
           parse_mode: 'HTML'
@@ -57,12 +57,12 @@ bot.start((ctx) => {
       )
     }).catch((error) => {
       // console.error('Referral error:', error);
-      ctx.reply(`Error for inviting ${refId} to join the SendChain Bot.`);
+      ctx.reply(`Error for inviting ${refId} to join the PandaKombat Bot.`);
     })
   }
 
   ctx.reply(
-    `<b>Hi, dear <a href="tg://user?id=${ctx.message.from.id}">${ctx.message.from.first_name}</a>! This is SendChain Bot 👋!</b> \n
+    `<b>Hi, dear <a href="tg://user?id=${ctx.message.from.id}">${ctx.message.from.first_name}</a>! This is PandaKombat Bot 👋!</b> \n
 <b>Tap on the coin and watch your $SEND grow.</b>`, 
     { 
       reply_markup: {
@@ -84,7 +84,7 @@ bot.command('referral', (ctx) => {
   })
   .finally(() => {
     ctx.replyWithHTML(`<b>Invite your friends and get bonuses for each invited friend! 🎁
-\n🎗Referral link: </b><code>https://t.me/SendChain_bot?start=${ctx.message.from.id}</code>
+\n🎗Referral link: </b><code>https://t.me/BambooBrawlerBot?start=${ctx.message.from.id}</code>
         \n<b>Your referrals : ${referrals}</b>`, {
           reply_markup: {
             inline_keyboard: [[{text: 'Back to menu', callback_data: 'menu'}]]
@@ -106,7 +106,7 @@ bot.action('referral', (ctx) => {
   })
   .finally(() => {
     ctx.replyWithHTML(`<b>Invite your friends and get bonuses for each invited friend! 🎁
-\n🎗Referral link: </b><code>https://t.me/SendChain_bot?start=${ctx.from.id}</code>
+\n🎗Referral link: </b><code>https://t.me/BambooBrawlerBot?start=${ctx.from.id}</code>
     \n<b>Your referrals : ${referrals}</b>`, {
       reply_markup: {
         inline_keyboard: [[{text: 'Back to menu', callback_data: 'menu'}]]

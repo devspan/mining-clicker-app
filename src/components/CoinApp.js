@@ -229,7 +229,7 @@ export default function CoinApp(props) {
         }
       })
       .catch(error => {
-        message.error('Something went wrong, please check SendChain bot!');
+        message.error('Something went wrong, please check PandaKombat bot!');
         // Additional code to handle the error...
       });
     } else {

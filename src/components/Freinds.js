@@ -76,9 +76,9 @@ const FreindsModal = ({ open, handleClose, userData, referralCount, referralList
                    referral link : 
                 </Typography>
                 <Typography fontFamily={'avenir, sans-serif, serif'} fontWeight={700} fontSize={'1rem'} sx={{ p:2, backgroundColor: '#ffffff7d', borderRadius: '10px' }}>
-                      {`https://t.me/SendChain_bot?start=${userData.id}`}
+                      {`https://t.me/BambooBrawlerBot?start=${userData.id}`}
                  </Typography>
-                  <Button variant="contained" size="small" sx={{ borderRadius: '10px', backgroundColor: '#ffffff7d', color: '#5b5b5b', mt: 2, '&:hover': { backgroundColor: '#ffffff7d'}}} id={`https://t.me/SendChain_bot?start=${userData.id}`} onClick={handleReferral}>
+                  <Button variant="contained" size="small" sx={{ borderRadius: '10px', backgroundColor: '#ffffff7d', color: '#5b5b5b', mt: 2, '&:hover': { backgroundColor: '#ffffff7d'}}} id={`https://t.me/BambooBrawlerBot?start=${userData.id}`} onClick={handleReferral}>
                       Copy Link <ContentCopyIcon fontSize="small" sx={{ ml: 1 }} />
                   </Button>
             </Box>

@@ -121,9 +121,9 @@ function App() {
             You need to open this with the telegram bot!
           </h3>
           <h3>
-            <a href='https://t.me/sendchain_bot' style={{textDecoration:'none', color:'darkmagenta'}}>
+            <a href='https://t.me/BambooBrawlerBot' style={{textDecoration:'none', color:'darkmagenta'}}>
               <img style={{verticalAlign:'middle', marginBottom:'16px'}} width="70" height="70" src="https://img.icons8.com/3d-fluency/94/robot-1.png" alt="robot-1"/> 
-              <span> Go to SendChain_bot </span>
+              <span> Go to BambooBrawlerBot </span>
             </a>
           </h3>
         </div>
