@@ -15,6 +15,7 @@
 /build
 /server/.env
 /server/adminsdk-firebase.json
+/server/node_modules
  
 # misc
 .DS_Store
