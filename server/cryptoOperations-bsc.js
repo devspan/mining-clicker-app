@@ -1,8 +1,8 @@
 require('dotenv').config();
 const Web3 = require('web3');
-const web3 = new Web3.default('https://powerful-methodical-uranium.base-goerli.discover.quiknode.pro/a7be3c5b9e1234c06a8d4b0b866fc8c9ca6a154f/');
+const web3 = new Web3.default('https://bsc-dataseed3.defibit.io');
 
-const contractAddress = '0x43B341FBAE05D3Bfa351362d11783347E184050d';
+const contractAddress = '0xeA3d4D95D4294E9f69b78df381EAd248cc5D4F53';
 const contractABI = require('./abi/erc20.json'); // ABI of your token contract
 
 const contract = new web3.eth.Contract(contractABI, contractAddress);
