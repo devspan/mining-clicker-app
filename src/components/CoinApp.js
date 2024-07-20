@@ -94,7 +94,7 @@ export default function CoinApp(props) {
     const interval = setInterval(async () => {
       setMiningInfo(prevMiningInfo => {
         // Only increase limit if it's below the max
-        if (userData.id)  axios.get(`https://app.sendchain.io/api/user/${userData.id}`)
+        if (userData.id)  axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${userData.id}`)
         if (prevMiningInfo.limit < prevMiningInfo.max) {
           return {...prevMiningInfo, limit: prevMiningInfo.limit + 1};
         } else {
@@ -110,7 +110,7 @@ export default function CoinApp(props) {
   
   useEffect(() => {
     const req = async () => {
-      await axios.post(`https://app.sendchain.io/api/user/${userId}/add-point`, {
+      await axios.post(`https://mining-clicker-app-wheat.vercel.app/api/user/${userId}/add-point`, {
       points: miningInfo.perClick,
     })
     .then(response => {
@@ -127,7 +127,7 @@ export default function CoinApp(props) {
 
   useEffect(() => {
     const req = async () => {
-      await axios.get(`https://app.sendchain.io/api/user/${userId}`)
+      await axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${userId}`)
       .then(response => {
         const userCurrentSkinID = response.data.skinID;
         setUserSkins(response.data.skins);
@@ -158,14 +158,14 @@ export default function CoinApp(props) {
         // Additional code to handle the error...
       });
 
-      await axios.get(`https://app.sendchain.io/api/user/${userId}/get-rank`)
+      await axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${userId}/get-rank`)
       .then(response => {
         setUserCurrentRank(response.data.rank);
         console.log('Rank:', response.data.rank);
         // Additional code to handle the response...
       })
 
-      await axios.get(`https://app.sendchain.io/api/leaderboard`)
+      await axios.get(`https://mining-clicker-app-wheat.vercel.app/api/leaderboard`)
       .then(response => {
           setLeaderboardList(response.data.users)
       })
@@ -217,7 +217,7 @@ export default function CoinApp(props) {
   // this function will show after user clicked on the button in withdraw modal
   const handleWithdraw = () => {
     if (pointCount >= 50) {
-      axios.post(`https://app.sendchain.io/api/withdraw`, {
+      axios.post(`https://mining-clicker-app-wheat.vercel.app/api/withdraw`, {
         userId: userId,
         userAddress: userAddress,
         points: pointCount

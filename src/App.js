@@ -84,7 +84,7 @@ function App() {
   const handleMiningInfo = () => {
     if (typeof userData.id === 'undefined') return null;
     // get user data by api and change limit 
-    axios.get(`https://app.sendchain.io/api/user/${userData.id}`)
+    axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${userData.id}`)
       .then((response) => {
         console.log(response)
         if (response.data && 'points' in response.data) {
@@ -102,7 +102,7 @@ function App() {
 
   const handleSignUp = () => {
     if (typeof userData.id === 'undefined') return null;
-    axios.post('https://app.sendchain.io/api/signup', 
+    axios.post('https://mining-clicker-app-wheat.vercel.app/api/signup', 
       {
        userId: userData.id, 
        username: userData.username,

@@ -29,7 +29,7 @@ function getLeague(points) {
 
 function getMenu() {
   return [
-    [{ text: 'Play Now! 🎡', web_app: { url: 'https://app.sendchain.io/' }}],
+    [{ text: 'Play Now! 🎡', web_app: { url: 'https://mining-clicker-app-wheat.vercel.app/' }}],
     [{ text: 'Show Profile 🌀', callback_data: 'show_profile' }, {text: 'Leaderboard 🔥', callback_data: 'leaderboard'}],
     [{ text: 'Referral Link 🎁', callback_data: 'referral' }, { text: 'Community 👥', url:'https://t.me/p2p_js'}]
   ]
@@ -42,7 +42,7 @@ bot.start((ctx) => {
   const refId = ctx.message.text.split(' ')[1];
   if (refId) {
     referrals.set(ctx.message.from.id, refId);
-    axios.post('https://app.sendchain.io/api/referral', {
+    axios.post('https://mining-clicker-app-wheat.vercel.app/api/referral', {
       referredId: ctx.message.from.id,
       referrerId: refId,
       firstname: ctx.message.from.first_name,
@@ -76,7 +76,7 @@ bot.start((ctx) => {
 // Add a command that gives the user their referral link
 bot.command('referral', (ctx) => {
   let referrals = 0;
-  axios.get(`https://app.sendchain.io/api/user/${ctx.from.id}`)
+  axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${ctx.from.id}`)
   .then((response) => {
      referrals = response.data.referrals;
   }).catch((error) => {
@@ -97,7 +97,7 @@ bot.action('referral', (ctx) => {
   ctx.deleteMessage();
   
   let referrals = 0;
-  axios.get(`https://app.sendchain.io/api/user/${ctx.from.id}`)
+  axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${ctx.from.id}`)
   .then((response) => {
      referrals = response.data.referrals;
   })
@@ -120,12 +120,12 @@ bot.action('show_profile', (ctx) => {
   let rank;
   
   // get user rank
-  axios.get(`https://app.sendchain.io/api/user/${ctx.from.id}/get-rank`)
+  axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${ctx.from.id}/get-rank`)
     .then((response) => {
         rank = response.data.rank;      
   }).finally(() => {
     // get user info by api
-    axios.get(`https://app.sendchain.io/api/user/${ctx.from.id}`)
+    axios.get(`https://mining-clicker-app-wheat.vercel.app/api/user/${ctx.from.id}`)
     .then((response) => {
         const points = response.data.points;
         const joinedAt = response.data.createdAt;
@@ -147,7 +147,7 @@ bot.action('show_profile', (ctx) => {
 
 bot.action('leaderboard', (ctx) => {
   ctx.deleteMessage();
-  axios.get('https://app.sendchain.io/api/leaderboard')
+  axios.get('https://mining-clicker-app-wheat.vercel.app/api/leaderboard')
   .then((response) => {
     let li = ''
     response.data.users.map((user, index) => {
