@@ -8,7 +8,7 @@ import './css/customStyle.css';
 const theme = createTheme();
 const tg = window.Telegram?.WebApp;
 
-console.log('Full Telegram WebApp object:', tg);
+console.log('Initial Telegram WebApp object:', tg);
 
 // Eruda initialization button component
 const ErudaButton = () => {
@@ -56,6 +56,7 @@ function App() {
 
   useEffect(() => {
     console.log('Initial useEffect running');
+    console.log('Telegram WebApp object in useEffect:', tg);
     if (tg) {
       console.log('Telegram WebApp found, calling tg.ready()');
       tg.ready();
@@ -77,36 +78,55 @@ function App() {
   const init = () => {
     console.log('Initializing app');
     try {
-      const initDataUnsafe = tg.initDataUnsafe;
-      console.log('Init data unsafe:', initDataUnsafe);
+      console.log('Full tg object:', tg);
+      console.log('tg.initData:', tg.initData);
+      console.log('tg.initDataUnsafe:', tg.initDataUnsafe);
+      
+      let initDataUnsafe;
+      if (typeof tg.initDataUnsafe === 'string') {
+        console.log('initDataUnsafe is a string, attempting to parse');
+        try {
+          initDataUnsafe = JSON.parse(tg.initDataUnsafe);
+        } catch (parseError) {
+          console.error('Error parsing initDataUnsafe:', parseError);
+        }
+      } else {
+        initDataUnsafe = tg.initDataUnsafe;
+      }
+      
+      console.log('Parsed/Retrieved initDataUnsafe:', initDataUnsafe);
+      
       if (initDataUnsafe && initDataUnsafe.user && initDataUnsafe.user.id) {
-        console.log('Setting user data:', initDataUnsafe.user);
+        console.log('Valid user data found:', initDataUnsafe.user);
         setUserData(initDataUnsafe.user);
       } else {
         console.warn('No valid user data in Telegram WebApp');
+        if (initDataUnsafe && initDataUnsafe.user) {
+          console.log('User object exists but might be incomplete:', initDataUnsafe.user);
+        }
         // Set a default user object
         setUserData({ id: 'unknown', first_name: 'Guest', username: 'guest' });
       }
     } catch (error) {
-      console.error('Error initializing app:', error);
+      console.error('Error in init function:', error);
       // Set a default user object in case of error
       setUserData({ id: 'error', first_name: 'Error', username: 'error' });
     }
   };
 
   const getUserProfile = async () => {
-    console.log('Getting user profile');
+    console.log('Getting user profile, userData:', userData);
     if (!userData?.id || userData.id === 'unknown' || userData.id === 'error') {
       console.warn('No valid user ID available for fetching profile');
       return;
     }
     try {
-      console.log('Fetching file ID');
+      console.log('Fetching file ID for user:', userData.id);
       const getFileId = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getUserProfilePhotos?user_id=${userData.id}`);
       console.log('File ID response:', getFileId.data);
       if (getFileId.data.result.photos && getFileId.data.result.photos.length > 0) {
         const fileId = getFileId.data.result.photos[0][2].file_id;
-        console.log('Fetching file path');
+        console.log('Fetching file path for fileId:', fileId);
         const getFilePath = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getFile?file_id=${fileId}`);
         console.log('File path response:', getFilePath.data);
         const filePath = getFilePath.data.result.file_path;
@@ -124,13 +144,13 @@ function App() {
   };
   
   const handleMiningInfo = async () => {
-    console.log('Handling mining info');
+    console.log('Handling mining info, userData:', userData);
     if (!userData?.id || userData.id === 'unknown' || userData.id === 'error') {
       console.warn('No valid user ID available for fetching mining info');
       return;
     }
     try {
-      console.log('Fetching user data');
+      console.log('Fetching user data for ID:', userData.id);
       const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/user/${userData.id}`);
       console.log('User data response:', response.data);
       if (response.data?.points) {
@@ -147,13 +167,13 @@ function App() {
   };
 
   const handleSignUp = async () => {
-    console.log('Handling sign up');
+    console.log('Handling sign up, userData:', userData);
     if (!userData?.id || userData.id === 'unknown' || userData.id === 'error') {
       console.warn('No valid user ID available for signup');
       return;
     }
     try {
-      console.log('Sending signup request');
+      console.log('Sending signup request for user:', userData);
       const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/signup`, {
         userId: userData.id,
         username: userData.username || 'unknown',
@@ -166,7 +186,7 @@ function App() {
     }
   };
 
-  console.log('Rendering App component');
+  console.log('Rendering App component, tg exists:', !!tg);
   return (
     <div className="App">
       {tg ? (
