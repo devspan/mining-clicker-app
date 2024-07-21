@@ -6,7 +6,9 @@ import './App.css';
 import './css/customStyle.css';
 
 const theme = createTheme();
-const isPhone = window.innerWidth < 600;
+const tg = window.Telegram?.WebApp;
+
+console.log('Telegram WebApp object:', tg);
 
 // Eruda initialization button component
 const ErudaButton = () => {
@@ -40,10 +42,11 @@ const ErudaButton = () => {
 };
 
 function App() {
+  console.log('App component rendering');
+
   const [userData, setUserData] = useState(null);
   const [profileUrl, setProfileUrl] = useState(null);
   const [pointCount, setPointCount] = useState(0);
-  const [isTelegramMiniApp, setIsTelegramMiniApp] = useState(false);
   const [miningInfo, setMiningInfo] = useState({
     status: 'idle',
     perClick: 2,
@@ -52,10 +55,18 @@ function App() {
   });
 
   useEffect(() => {
-    init();
+    console.log('Initial useEffect running');
+    if (tg) {
+      console.log('Telegram WebApp found, calling tg.ready()');
+      tg.ready();
+      init();
+    } else {
+      console.log('Telegram WebApp not found');
+    }
   }, []);
 
   useEffect(() => {
+    console.log('userData useEffect running, userData:', userData);
     if (userData?.id) {
       getUserProfile();
       handleSignUp();
@@ -64,91 +75,96 @@ function App() {
   }, [userData]);
 
   const init = () => {
+    console.log('Initializing app');
     try {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.ready();
-        const webAppData = window.Telegram.WebApp.initDataUnsafe;
-        if (webAppData && webAppData.user) {
-          setUserData(webAppData.user);
-          setIsTelegramMiniApp(true);
-          console.log('Initialized with Telegram data:', webAppData.user);
-        } else {
-          throw new Error('No user data in Telegram WebApp');
-        }
+      const initDataUnsafe = tg.initDataUnsafe;
+      console.log('Init data unsafe:', initDataUnsafe);
+      if (initDataUnsafe && initDataUnsafe.user) {
+        console.log('Setting user data:', initDataUnsafe.user);
+        setUserData(initDataUnsafe.user);
       } else {
-        throw new Error('Not in Telegram WebApp environment');
+        throw new Error('No user data in Telegram WebApp');
       }
     } catch (error) {
       console.error('Error initializing app:', error);
-      // Fallback to simulated data
-      const simulatedData = {
-        "id": 2023448791,
-        "first_name": "Tholana",
-        "last_name": "Tyson",
-        "username": "tholanamike",
-        "language_code": "en",
-        "is_premium": false,
-        "allows_write_to_pm": true
-      };
-      setUserData(simulatedData);
-      setIsTelegramMiniApp(false);
-      console.log('Initialized with simulated data:', simulatedData);
     }
   };
 
   const getUserProfile = async () => {
-    if (!userData?.id) return;
+    console.log('Getting user profile');
+    if (!userData?.id) {
+      console.error('No user ID available for fetching profile');
+      return;
+    }
     try {
+      console.log('Fetching file ID');
       const getFileId = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getUserProfilePhotos?user_id=${userData.id}`);
+      console.log('File ID response:', getFileId.data);
       const fileId = getFileId.data.result.photos[0][2].file_id;
+      console.log('Fetching file path');
       const getFilePath = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getFile?file_id=${fileId}`);
+      console.log('File path response:', getFilePath.data);
       const filePath = getFilePath.data.result.file_path;
       const url = `${process.env.REACT_APP_API_BASE_URL}/file/bot${process.env.REACT_APP_TELEGRAM_BOT_TOKEN}/${filePath}`;
+      console.log('Setting profile URL:', url);
       setProfileUrl(url);
-      console.log('Profile URL set:', url);
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      setProfileUrl('/default-profile-image.png'); // Set a default image URL
     }
   };
   
   const handleMiningInfo = async () => {
-    if (!userData?.id) return;
+    console.log('Handling mining info');
+    if (!userData?.id) {
+      console.error('No user ID available for fetching mining info');
+      return;
+    }
     try {
+      console.log('Fetching user data');
       const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/user/${userData.id}`);
-      if (response.data?.points) setPointCount(response.data.points);
+      console.log('User data response:', response.data);
+      if (response.data?.points) {
+        console.log('Setting point count:', response.data.points);
+        setPointCount(response.data.points);
+      }
       if (response.data?.limit) {
+        console.log('Updating mining info limit:', response.data.limit);
         setMiningInfo(prevMiningInfo => ({ ...prevMiningInfo, limit: response.data.limit }));
       }
-      console.log('Mining info updated:', response.data);
     } catch (error) {
       console.error('Mining info error:', error);
     }
   };
 
   const handleSignUp = async () => {
-    if (!userData?.id) return;
+    console.log('Handling sign up');
+    if (!userData?.id) {
+      console.error('No user ID available for signup');
+      return;
+    }
     try {
+      console.log('Sending signup request');
       const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/signup`, {
         userId: userData.id,
         username: userData.username,
         firstname: userData.first_name,
         lastname: userData.last_name || 'null',
       });
-      console.log('Signup was successful:', response.data);
+      console.log('Signup response:', response.data);
     } catch (error) {
       console.error('Signup error:', error);
     }
   };
 
+  console.log('Rendering App component');
   return (
     <div className="App">
-      {isPhone || isTelegramMiniApp ? (
+      {tg ? (
         <ThemeProvider theme={theme}>
           <CoinApp
             userData={userData}
             profileUrl={profileUrl}
-            telApp={window.Telegram?.WebApp}
+            tg={tg}
             userId={userData?.id}
             pointCount={pointCount}
             setPointCount={setPointCount}
@@ -160,7 +176,7 @@ function App() {
       ) : (
         <div style={{height:'110vh'}}>
           <h3 style={{textAlign: 'center', background: 'rgb(216 215 215 / 42%)', display: 'inline-flex', padding: '20px', marginTop: '40vh', borderRadius: '20px'}}>
-            You need to open this with the telegram bot!
+            You need to open this with the Telegram bot!
           </h3>
           <h3>
             <a href='https://t.me/BambooBrawlerBot' style={{textDecoration:'none', color:'darkmagenta'}}>
