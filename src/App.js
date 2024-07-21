@@ -9,6 +9,37 @@ const theme = createTheme();
 const telApp = window.Telegram?.WebApp;
 const isPhone = window.innerWidth < 600;
 
+// Eruda initialization button component
+const ErudaButton = () => {
+  const initEruda = () => {
+    if (window.eruda) {
+      window.eruda.init();
+      console.log('Eruda initialized');
+    } else {
+      console.error('Eruda not found');
+    }
+  };
+
+  return (
+    <button 
+      onClick={initEruda}
+      style={{
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        zIndex: 9999,
+        padding: '10px',
+        background: '#007bff',
+        color: 'white',
+        border: 'none',
+        borderRadius: '5px'
+      }}
+    >
+      Debug
+    </button>
+  );
+};
+
 function App() {
   const [userData, setUserData] = useState(null);
   const [profileUrl, setProfileUrl] = useState(null);
@@ -54,6 +85,7 @@ function App() {
       }
       setUserData(data);
       setIsTelegramMiniApp(!!data);
+      console.log('Initialized with data:', data); // Eruda log
     } catch (error) {
       console.error('Error initializing app:', error);
       setIsTelegramMiniApp(false);
@@ -66,7 +98,9 @@ function App() {
       const fileId = getFileId.data.result.photos[0][2].file_id;
       const getFilePath = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getFile?file_id=${fileId}`);
       const filePath = getFilePath.data.result.file_path;
-      setProfileUrl(`${process.env.REACT_APP_API_BASE_URL}/file/bot${process.env.REACT_APP_TELEGRAM_BOT_TOKEN}/${filePath}`);
+      const url = `${process.env.REACT_APP_API_BASE_URL}/file/bot${process.env.REACT_APP_TELEGRAM_BOT_TOKEN}/${filePath}`;
+      setProfileUrl(url);
+      console.log('Profile URL set:', url); // Eruda log
     } catch (error) {
       console.error('Error fetching user profile:', error);
     }
@@ -80,6 +114,7 @@ function App() {
       if (response.data?.limit) {
         setMiningInfo(prevMiningInfo => ({ ...prevMiningInfo, limit: response.data.limit }));
       }
+      console.log('Mining info updated:', response.data); // Eruda log
     } catch (error) {
       console.error('Mining info error:', error);
     }
@@ -88,13 +123,13 @@ function App() {
   const handleSignUp = async () => {
     if (!userData?.id) return;
     try {
-      await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/signup`, {
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/signup`, {
         userId: userData.id,
         username: userData.username,
         firstname: userData.first_name,
         lastname: userData.last_name || 'null',
       });
-      console.log('Signup was successful');
+      console.log('Signup was successful:', response.data); // Eruda log
     } catch (error) {
       console.error('Signup error:', error);
     }
@@ -114,6 +149,7 @@ function App() {
             miningInfo={miningInfo}
             setMiningInfo={setMiningInfo}
           />
+          <ErudaButton />
         </ThemeProvider>
       ) : (
         <div style={{height:'110vh'}}>
@@ -126,6 +162,7 @@ function App() {
               <span> Go to BambooBrawlerBot </span>
             </a>
           </h3>
+          <ErudaButton />
         </div>
       )}
     </div>
