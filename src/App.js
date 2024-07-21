@@ -8,7 +8,7 @@ import './css/customStyle.css';
 const theme = createTheme();
 const tg = window.Telegram?.WebApp;
 
-console.log('Telegram WebApp object:', tg);
+console.log('Full Telegram WebApp object:', tg);
 
 // Eruda initialization button component
 const ErudaButton = () => {
@@ -61,7 +61,7 @@ function App() {
       tg.ready();
       init();
     } else {
-      console.log('Telegram WebApp not found');
+      console.warn('Telegram WebApp not found');
     }
   }, []);
 
@@ -79,44 +79,54 @@ function App() {
     try {
       const initDataUnsafe = tg.initDataUnsafe;
       console.log('Init data unsafe:', initDataUnsafe);
-      if (initDataUnsafe && initDataUnsafe.user) {
+      if (initDataUnsafe && initDataUnsafe.user && initDataUnsafe.user.id) {
         console.log('Setting user data:', initDataUnsafe.user);
         setUserData(initDataUnsafe.user);
       } else {
-        throw new Error('No user data in Telegram WebApp');
+        console.warn('No valid user data in Telegram WebApp');
+        // Set a default user object
+        setUserData({ id: 'unknown', first_name: 'Guest', username: 'guest' });
       }
     } catch (error) {
       console.error('Error initializing app:', error);
+      // Set a default user object in case of error
+      setUserData({ id: 'error', first_name: 'Error', username: 'error' });
     }
   };
 
   const getUserProfile = async () => {
     console.log('Getting user profile');
-    if (!userData?.id) {
-      console.error('No user ID available for fetching profile');
+    if (!userData?.id || userData.id === 'unknown' || userData.id === 'error') {
+      console.warn('No valid user ID available for fetching profile');
       return;
     }
     try {
       console.log('Fetching file ID');
       const getFileId = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getUserProfilePhotos?user_id=${userData.id}`);
       console.log('File ID response:', getFileId.data);
-      const fileId = getFileId.data.result.photos[0][2].file_id;
-      console.log('Fetching file path');
-      const getFilePath = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getFile?file_id=${fileId}`);
-      console.log('File path response:', getFilePath.data);
-      const filePath = getFilePath.data.result.file_path;
-      const url = `${process.env.REACT_APP_API_BASE_URL}/file/bot${process.env.REACT_APP_TELEGRAM_BOT_TOKEN}/${filePath}`;
-      console.log('Setting profile URL:', url);
-      setProfileUrl(url);
+      if (getFileId.data.result.photos && getFileId.data.result.photos.length > 0) {
+        const fileId = getFileId.data.result.photos[0][2].file_id;
+        console.log('Fetching file path');
+        const getFilePath = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getFile?file_id=${fileId}`);
+        console.log('File path response:', getFilePath.data);
+        const filePath = getFilePath.data.result.file_path;
+        const url = `${process.env.REACT_APP_API_BASE_URL}/file/bot${process.env.REACT_APP_TELEGRAM_BOT_TOKEN}/${filePath}`;
+        console.log('Setting profile URL:', url);
+        setProfileUrl(url);
+      } else {
+        console.warn('No profile photo available');
+        setProfileUrl(null);
+      }
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      setProfileUrl(null);
     }
   };
   
   const handleMiningInfo = async () => {
     console.log('Handling mining info');
-    if (!userData?.id) {
-      console.error('No user ID available for fetching mining info');
+    if (!userData?.id || userData.id === 'unknown' || userData.id === 'error') {
+      console.warn('No valid user ID available for fetching mining info');
       return;
     }
     try {
@@ -138,17 +148,17 @@ function App() {
 
   const handleSignUp = async () => {
     console.log('Handling sign up');
-    if (!userData?.id) {
-      console.error('No user ID available for signup');
+    if (!userData?.id || userData.id === 'unknown' || userData.id === 'error') {
+      console.warn('No valid user ID available for signup');
       return;
     }
     try {
       console.log('Sending signup request');
       const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/signup`, {
         userId: userData.id,
-        username: userData.username,
-        firstname: userData.first_name,
-        lastname: userData.last_name || 'null',
+        username: userData.username || 'unknown',
+        firstname: userData.first_name || 'Unknown',
+        lastname: userData.last_name || 'Unknown',
       });
       console.log('Signup response:', response.data);
     } catch (error) {
