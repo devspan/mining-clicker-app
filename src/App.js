@@ -6,7 +6,6 @@ import './App.css';
 import './css/customStyle.css';
 
 const theme = createTheme();
-const telApp = window.Telegram?.WebApp;
 const isPhone = window.innerWidth < 600;
 
 // Eruda initialization button component
@@ -44,7 +43,7 @@ function App() {
   const [userData, setUserData] = useState(null);
   const [profileUrl, setProfileUrl] = useState(null);
   const [pointCount, setPointCount] = useState(0);
-  const [isTelegramMiniApp, setIsTelegramMiniApp] = useState(true);
+  const [isTelegramMiniApp, setIsTelegramMiniApp] = useState(false);
   const [miningInfo, setMiningInfo] = useState({
     status: 'idle',
     perClick: 2,
@@ -53,7 +52,6 @@ function App() {
   });
 
   useEffect(() => {
-    if (telApp) telApp.ready();
     init();
   }, []);
 
@@ -67,32 +65,39 @@ function App() {
 
   const init = () => {
     try {
-      const search = window.Telegram?.WebApp.initData;
-      let data = null;
-      if (search) {
-        const converted = JSON.parse('{"' + search.replace(/&/g, '","').replace(/=/g,'":"') + '"}', (key, value) => key === "" ? value : decodeURIComponent(value));
-        data = JSON.parse(converted.user);
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        const webAppData = window.Telegram.WebApp.initDataUnsafe;
+        if (webAppData && webAppData.user) {
+          setUserData(webAppData.user);
+          setIsTelegramMiniApp(true);
+          console.log('Initialized with Telegram data:', webAppData.user);
+        } else {
+          throw new Error('No user data in Telegram WebApp');
+        }
       } else {
-        data = {
-          "id": 2023448791,
-          "first_name": "Tholana",
-          "last_name": "Tyson",
-          "username": "tholanamike",
-          "language_code": "en",
-          "is_premium": false,
-          "allows_write_to_pm": true
-        };
+        throw new Error('Not in Telegram WebApp environment');
       }
-      setUserData(data);
-      setIsTelegramMiniApp(!!data);
-      console.log('Initialized with data:', data); // Eruda log
     } catch (error) {
       console.error('Error initializing app:', error);
+      // Fallback to simulated data
+      const simulatedData = {
+        "id": 2023448791,
+        "first_name": "Tholana",
+        "last_name": "Tyson",
+        "username": "tholanamike",
+        "language_code": "en",
+        "is_premium": false,
+        "allows_write_to_pm": true
+      };
+      setUserData(simulatedData);
       setIsTelegramMiniApp(false);
+      console.log('Initialized with simulated data:', simulatedData);
     }
   };
 
   const getUserProfile = async () => {
+    if (!userData?.id) return;
     try {
       const getFileId = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/getUserProfilePhotos?user_id=${userData.id}`);
       const fileId = getFileId.data.result.photos[0][2].file_id;
@@ -100,9 +105,10 @@ function App() {
       const filePath = getFilePath.data.result.file_path;
       const url = `${process.env.REACT_APP_API_BASE_URL}/file/bot${process.env.REACT_APP_TELEGRAM_BOT_TOKEN}/${filePath}`;
       setProfileUrl(url);
-      console.log('Profile URL set:', url); // Eruda log
+      console.log('Profile URL set:', url);
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      setProfileUrl('/default-profile-image.png'); // Set a default image URL
     }
   };
   
@@ -114,7 +120,7 @@ function App() {
       if (response.data?.limit) {
         setMiningInfo(prevMiningInfo => ({ ...prevMiningInfo, limit: response.data.limit }));
       }
-      console.log('Mining info updated:', response.data); // Eruda log
+      console.log('Mining info updated:', response.data);
     } catch (error) {
       console.error('Mining info error:', error);
     }
@@ -129,7 +135,7 @@ function App() {
         firstname: userData.first_name,
         lastname: userData.last_name || 'null',
       });
-      console.log('Signup was successful:', response.data); // Eruda log
+      console.log('Signup was successful:', response.data);
     } catch (error) {
       console.error('Signup error:', error);
     }
@@ -137,12 +143,12 @@ function App() {
 
   return (
     <div className="App">
-      {isPhone && isTelegramMiniApp ? (
+      {isPhone || isTelegramMiniApp ? (
         <ThemeProvider theme={theme}>
           <CoinApp
             userData={userData}
             profileUrl={profileUrl}
-            telApp={telApp}
+            telApp={window.Telegram?.WebApp}
             userId={userData?.id}
             pointCount={pointCount}
             setPointCount={setPointCount}
